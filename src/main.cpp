@@ -32,7 +32,7 @@ enum ButtonState
 };
 
 M5HatMiniJoyC joyc; // Joystick object
-BleGamepad bleGamepad("M5MiniJoy StickC+ Gamepad", "M5Stack", 100);
+BleGamepad bleGamepad("M5MiniJoyC Gamepad", "davevw.com", 100);
 BleGamepadConfiguration bleGamepadConfig;
 ButtonState lastState = ButtonState::UNKNOWN;
 
