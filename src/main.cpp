@@ -38,10 +38,25 @@ ButtonState lastState = ButtonState::UNKNOWN;
 
 static void waitMiniJoyCReady() // from https://github.com/m5stack/StackChan/blob/main/remote/code/main/StackChan-RemoteControl-ESPNow.cpp
 {
+    int retry = 0;
+
     while (!joyc.begin(&Wire, MiniJoyC_ADDR, JOYC_SDA, JOYC_SCL,
                        100000UL))
     {
         delay(100); // Retry every 100ms
+        if (++retry == 10) {
+            auto message = "No MiniJoyC";
+            M5.Display.beginTransaction();
+            M5.Display.setRotation(1);
+            M5.Display.setFont(&lv_font_montserrat_24);
+            int x = (M5.Display.width() - M5.Display.textWidth(message)) / 2;
+            int y = (M5.Display.height() - 32) / 2;
+            M5.Display.fillScreen(TFT_RED);
+            M5.Display.setTextColor(TFT_BLACK);
+            M5.Display.setCursor(x, y);
+            M5.Display.print(message);
+            M5.Display.endTransaction();
+        }
     }
 }
 
