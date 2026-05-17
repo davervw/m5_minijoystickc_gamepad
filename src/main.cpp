@@ -71,6 +71,32 @@ class MyGamepadCallbacks : public NimBLEServerCallbacks
     }
 };
 
+void toggleScreen()
+{
+    static bool showScreen = false;
+
+    showScreen = !showScreen;
+
+    if (showScreen) {
+        M5.Display.beginTransaction();
+        M5.Display.setRotation(1);
+        M5.Display.fillRect(0, 16, M5.Display.width(), M5.Display.height()-16, TFT_WHITE);
+        drawImage();
+        M5.Display.setCursor(0, 0);
+        M5.Display.fillRect(0, 0, M5.Display.width()-32, 16, TFT_BLACK);
+        M5.Display.setTextColor(TFT_WHITE);
+        M5.Display.setFont(&lv_font_montserrat_12);
+        M5.Display.print("ble_gamepad_M5MiniJoyStickC+");
+        M5.Display.setCursor(0, 16);
+        M5.Display.setTextColor(TFT_BLACK);
+        M5.Display.setFont(&lv_font_montserrat_14);
+        M5.Display.print("davevw.com");
+        M5.Display.endTransaction();
+    } else {
+        M5.Display.fillRect(0, 16, M5.Display.width(), M5.Display.height()-16, TFT_BLACK);
+    }
+}
+
 void setup()
 {
     WiFi.disconnect();
@@ -81,22 +107,10 @@ void setup()
     memset(&cfg, 0, sizeof(cfg));
     M5.begin(cfg);
 
-    M5.Display.beginTransaction();
-    M5.Display.setRotation(1);
-    M5.Display.fillScreen(TFT_WHITE);
-    drawImage();
-    M5.Display.setCursor(0, 0);
-    M5.Display.fillRect(0, 0, M5.Display.width(), 16, TFT_BLACK);
-    M5.Display.setTextColor(TFT_WHITE);
-    M5.Display.setFont(&lv_font_montserrat_12);
-    M5.Display.print("ble_gamepad_M5MiniJoyStickC+");
-    M5.Display.setCursor(0, 16);
-    M5.Display.setTextColor(TFT_BLACK);
-    M5.Display.setFont(&lv_font_montserrat_14);
-    M5.Display.print("davevw.com");
-    M5.Display.endTransaction();
-
     waitMiniJoyCReady();
+
+    M5.Display.fillScreen(TFT_BLACK);
+    toggleScreen();
 
     // --- HID Report Map Configuration ---
     bleGamepadConfig.setAutoReport(false); // Best practice: manual reports
@@ -257,6 +271,8 @@ void loop()
 {
     serviceBLE();
     M5.update();
+    if (M5.BtnB.wasReleasedAfterHold())
+        toggleScreen();
     SendButtonState();
     serviceLED();
     delay(10);
