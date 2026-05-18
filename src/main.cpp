@@ -101,7 +101,10 @@ void toggleScreen()
         M5.Display.fillRect(0, 0, M5.Display.width()-32, 16, TFT_BLACK);
         M5.Display.setTextColor(TFT_WHITE);
         M5.Display.setFont(&lv_font_montserrat_12);
-        M5.Display.print("ble_gamepad_M5MiniJoyStickC+");
+        String title = "ble_gamepad_M5MiniJoyStickC+";
+        while (M5.Display.textWidth(title)+32 > M5.Display.width())
+            title = title.substring(0, title.length()-1);
+        M5.Display.print(title);
         M5.Display.setCursor(0, 16);
         M5.Display.setTextColor(TFT_BLACK);
         M5.Display.setFont(&lv_font_montserrat_14);
