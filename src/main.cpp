@@ -29,6 +29,8 @@ enum ButtonState
     DOWN = 8,
     LEFT = 16,
     RIGHT = 32,
+    SELECT = 64,
+    START = 128,
 };
 
 M5HatMiniJoyC joyc; // Joystick object
@@ -117,13 +119,12 @@ void toggleScreen()
 
 void setup()
 {
+    auto cfg = M5.config();
+    M5.begin(cfg);
+
     WiFi.disconnect();
     delay(100);
     WiFi.mode(WIFI_MODE_NULL);
-
-    m5::M5Unified::config_t cfg;
-    memset(&cfg, 0, sizeof(cfg));
-    M5.begin(cfg);
 
     waitMiniJoyCReady();
 
@@ -132,7 +133,7 @@ void setup()
 
     // --- HID Report Map Configuration ---
     bleGamepadConfig.setAutoReport(false); // Best practice: manual reports
-    bleGamepadConfig.setButtonCount(2);    // Button 1 (A), 2 (B)
+    bleGamepadConfig.setButtonCount(10);    // Button 1 (A), 2 (B), 9 (SELECT), 10 (START)
     bleGamepadConfig.setHatSwitchCount(1); // One D-pad (Point of View Hat)
 
     // Parameters: (X, Y, Z, RX, RY, RZ, Slider1, Slider2)
@@ -207,6 +208,13 @@ void SendButtonState()
     auto state = 0;
     auto button1 = M5.BtnA.isPressed();
     auto button2 = !joyc.getButtonStatus();
+
+    // so we can get two buttons from one
+    //   START = hold B for >= 500ms
+    //   SELECT = release of B < 500ms
+    auto start = M5.BtnB.wasReleaseFor(500) && !M5.BtnB.wasReleaseFor(1000);
+    auto select = !start && M5.BtnB.wasReleased();
+
     auto x = (short)joyc.getPOSValue(minijoyc_pos_index_t::POS_X, minijoyc_pos_read_mode_t::_10bit);
     auto y = (short)joyc.getPOSValue(minijoyc_pos_index_t::POS_Y, minijoyc_pos_read_mode_t::_10bit);
     // printf("button1: %d button2: %d x: %d y: %d\n", button1, button2, x, y);
@@ -223,6 +231,11 @@ void SendButtonState()
         state |= ButtonState::UP;
     if (x <= -300)
         state |= ButtonState::DOWN;
+    if (select)
+        state |= ButtonState::SELECT;
+    if (start)
+        state |= ButtonState::START;
+
     auto buttonState = static_cast<ButtonState>(state);
 
     // Send button states to the connected BLE client
@@ -234,6 +247,14 @@ void SendButtonState()
         bleGamepad.press(2);
     else
         bleGamepad.release(2);
+    if ((buttonState & ButtonState::SELECT) == ButtonState::SELECT)
+        bleGamepad.press(9);
+    else
+        bleGamepad.release(9);
+    if ((buttonState & ButtonState::START) == ButtonState::START)
+        bleGamepad.press(10);
+    else
+        bleGamepad.release(10);
 
     signed char hatValue = DPAD_CENTERED;
 
@@ -289,7 +310,7 @@ void loop()
 {
     serviceBLE();
     M5.update();
-    if (M5.BtnB.wasReleasedAfterHold())
+    if (M5.BtnB.wasReleaseFor(1000))
         toggleScreen();
     SendButtonState();
     serviceLED();
