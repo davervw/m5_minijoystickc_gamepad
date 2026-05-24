@@ -8,5 +8,6 @@ M5 is first button, joystick click is second button, hold stick's B (backside in
 
 Also see:
 
-* [https://github.com/davervw/Cardputer-Game-Station-Emulators](https://github.com/davervw/Cardputer-Game-Station-Emulators)
-* [https://github.com/davervw/gamepad_test](https://github.com/davervw/gamepad_test)
+* [github.com/davervw/Cardputer-Game-Station-Emulators](https://github.com/davervw/Cardputer-Game-Station-Emulators)
+* [github.com/davervw/gamepad_test](https://github.com/davervw/gamepad_test)
+* [github.com/davervw/ble_gamepad_KanoPixelKit](https://github.com/davervw/ble_gamepad_KanoPixelKit)
