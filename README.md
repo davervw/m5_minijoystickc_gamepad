@@ -11,3 +11,4 @@ Also see:
 * [github.com/davervw/Cardputer-Game-Station-Emulators](https://github.com/davervw/Cardputer-Game-Station-Emulators)
 * [github.com/davervw/gamepad_test](https://github.com/davervw/gamepad_test)
 * [github.com/davervw/ble_gamepad_KanoPixelKit](https://github.com/davervw/ble_gamepad_KanoPixelKit)
+* [blog.davevw.com](https://techwithdave.davevw.com/2026/05/ble-hid-gamepad-firmware-for-m5stack.html)
